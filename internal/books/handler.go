@@ -6,26 +6,39 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterRoutes(router *gin.Engine) {
-	bookRoutes := router.Group("/books")
-	bookRoutes.POST("/", AddBook)
-	bookRoutes.DELETE("/:id", DeleteBook)
+// Handler holds the book service
+type Handler struct {
+	service *Service
 }
 
-func AddBook(c *gin.Context) {
-	var book Book
-	if err := c.ShouldBindJSON(&book); err != nil {
+// NewHandler creates a new book handler
+func NewHandler(service *Service) *Handler {
+	return &Handler{service: service}
+}
+
+// RegisterRoutes sets up book routes
+func RegisterRoutes(router *gin.Engine) {
+	repo := NewRepository()
+	service := NewService(repo)
+	handler := NewHandler(service)
+
+	router.GET("/books", handler.getBooks)
+	router.POST("/books", handler.addBook)
+}
+
+// GetBooks returns all books
+func (h *Handler) getBooks(c *gin.Context) {
+	books := h.service.GetBooks()
+	c.JSON(http.StatusOK, books)
+}
+
+// AddBook adds a new book
+func (h *Handler) addBook(c *gin.Context) {
+	var newBook Book
+	if err := c.ShouldBindJSON(&newBook); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	// Save to database (use repository function)
-	c.JSON(http.StatusCreated, gin.H{"message": "Book added successfully"})
-}
-
-func DeleteBook(c *gin.Context) {
-	id := c.Param("id")
-
-	// Delete from database (use repository function)
-	c.JSON(http.StatusOK, gin.H{"message": "Book deleted successfully"})
+	createdBook := h.service.AddBook(newBook.Title, newBook.Author)
+	c.JSON(http.StatusCreated, createdBook)
 }

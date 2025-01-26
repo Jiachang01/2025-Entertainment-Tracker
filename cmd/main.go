@@ -2,8 +2,8 @@ package main
 
 import (
 	"log"
-	"net/http"
 
+	"github.com/Jiachang01/2025-Entertainment-Tracker/internal/books"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,5 +12,8 @@ func main() {
 	books.RegisterRoutes(router)
 
 	log.Println("Server running on port 8080")
-	http.ListenAndServe(":8080", router)
+	err := router.Run(":8080")
+	if err != nil {
+		log.Fatal("Failed to start server:", err)
+	}
 }

@@ -16,7 +16,9 @@ type Repository struct {
 func NewRepository() *Repository {
 	return &Repository{
 		books: []Book{
-			{ID: 1, Title: "The Go Programming Language", Author: "Alan A. A. Donovan"},
+			{ID: 1, Title: "Atomic Habits", Author: "James Clear"},
+			{ID: 2, Title: "The Mountain is You", Author: "Brianna Wiest"},
+			{ID: 3, Title: "The Comfort Book", Author: "Matt Haig"},
 		},
 	}
 }
